@@ -40,6 +40,7 @@ function RichText({ nodes }) {
 function Drawer({ story, onClose }) {
   const [visible, setVisible] = useState(false);
   const [dragX, setDragX] = useState(0);
+  const [dragging, setDragging] = useState(false);
   const startX = useRef(0);
   const startY = useRef(0);
   const startTime = useRef(0);
@@ -55,11 +56,33 @@ function Drawer({ story, onClose }) {
     return () => document.removeEventListener('keydown', onKey);
   }, []);
 
+  useEffect(() => {
+    const scrollY = window.scrollY;
+    const orig = {
+      overflow: document.body.style.overflow,
+      position: document.body.style.position,
+      top: document.body.style.top,
+      width: document.body.style.width,
+    };
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+    return () => {
+      document.body.style.overflow = orig.overflow;
+      document.body.style.position = orig.position;
+      document.body.style.top = orig.top;
+      document.body.style.width = orig.width;
+      window.scrollTo(0, scrollY);
+    };
+  }, []);
+
   const onTouchStart = (e) => {
     startX.current = e.touches[0].clientX;
     startY.current = e.touches[0].clientY;
     startTime.current = Date.now();
     axis.current = null;
+    setDragging(true);
   };
   const onTouchMove = (e) => {
     const dx = e.touches[0].clientX - startX.current;
@@ -70,14 +93,13 @@ function Drawer({ story, onClose }) {
     if (axis.current === 'x' && dx > 0) setDragX(dx);
   };
   const onTouchEnd = (e) => {
+    setDragging(false);
     if (axis.current !== 'x') return;
     const dx = e.changedTouches[0].clientX - startX.current;
     const velocity = dx / (Date.now() - startTime.current);
     if (dx > 100 || velocity > 0.4) handleClose();
     else setDragX(0);
   };
-
-  const dragging = dragX > 0;
 
   return (
     <>
