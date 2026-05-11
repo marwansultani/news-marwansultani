@@ -253,10 +253,59 @@ function Bucket({ bucket }) {
   );
 }
 
+function usePullToRefresh() {
+  const [progress, setProgress] = useState(0);
+  const [triggered, setTriggered] = useState(false);
+  const startY = useRef(-1);
+  const pulling = useRef(false);
+  const THRESHOLD = 80;
+
+  useEffect(() => {
+    const onTouchStart = (e) => {
+      if (window.scrollY === 0) {
+        startY.current = e.touches[0].clientY;
+        pulling.current = false;
+      } else {
+        startY.current = -1;
+      }
+    };
+    const onTouchMove = (e) => {
+      if (startY.current < 0) return;
+      const dy = e.touches[0].clientY - startY.current;
+      if (dy > 0) {
+        pulling.current = true;
+        setProgress(Math.min(dy / THRESHOLD, 1));
+      }
+    };
+    const onTouchEnd = () => {
+      if (!pulling.current) return;
+      if (progress >= 1) {
+        setTriggered(true);
+        setTimeout(() => window.location.reload(), 200);
+      } else {
+        setProgress(0);
+      }
+      startY.current = -1;
+      pulling.current = false;
+    };
+    document.addEventListener('touchstart', onTouchStart, { passive: true });
+    document.addEventListener('touchmove', onTouchMove, { passive: true });
+    document.addEventListener('touchend', onTouchEnd, { passive: true });
+    return () => {
+      document.removeEventListener('touchstart', onTouchStart);
+      document.removeEventListener('touchmove', onTouchMove);
+      document.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [progress]);
+
+  return { progress, triggered };
+}
+
 export default function DailyDigest({ days, digests, initialReadState }) {
   const [activeDay, setActiveDay] = useState(0);
   const [readState, setReadState] = useState(initialReadState || {});
   const markReadTimer = useRef(null);
+  const { progress, triggered } = usePullToRefresh();
 
   useEffect(() => {
     if (!document.getElementById('digest-fonts')) {
@@ -323,7 +372,18 @@ export default function DailyDigest({ days, digests, initialReadState }) {
 
   return (
     <div style={{ background: '#f5f0e8', minHeight: '100vh' }}>
-      <style>{`@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }`}</style>
+      <style>{`@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } } @keyframes shimmer { 0%,100% { opacity:1 } 50% { opacity:0.4 } }`}</style>
+      {(progress > 0 || triggered) && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, height: 3, zIndex: 200, background: '#e8e2d8' }}>
+          <div style={{
+            height: '100%',
+            background: '#8b2020',
+            width: triggered ? '100%' : `${progress * 100}%`,
+            transition: triggered ? 'width 0.25s ease' : 'none',
+            animation: triggered ? 'shimmer 0.6s ease infinite' : 'none',
+          }} />
+        </div>
+      )}
 
       {/* Nav */}
       <div style={{ position: 'sticky', top: 0, zIndex: 10 }}>
