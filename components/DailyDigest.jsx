@@ -128,7 +128,7 @@ function Drawer({ story, onClose }) {
           <span style={{ fontSize: 10, letterSpacing: 2, color: '#9ca3af', textTransform: 'uppercase' }}>
             {story.sources.length} source{story.sources.length > 1 ? 's' : ''}
           </span>
-          <button onClick={handleClose} style={{ background: '#ede8df', border: 'none', borderRadius: '50%', width: 34, height: 34, fontSize: 20, cursor: 'pointer', color: '#78716c', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>×</button>
+          <div onClick={handleClose} role="button" tabIndex={0} onKeyDown={e => e.key === 'Enter' && handleClose()} style={{ background: '#ede8df', borderRadius: '50%', width: 34, height: 34, cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L13 13M13 1L1 13" stroke="#78716c" strokeWidth="2" strokeLinecap="round"/></svg></div>
         </div>
         <div style={{ flex: 1, overflowY: 'auto', padding: '8px 24px 32px' }}>
           {story.sources.map((source, i) => {
