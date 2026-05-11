@@ -4,11 +4,10 @@ import { useState, useEffect, useRef } from 'react';
 import NotificationSetup from './NotificationSetup';
 
 const SOURCES = {
-  'Morning Brew': { bg: '#eff6ff', border: '#93c5fd', label: '#1e40af', dot: '#1d4ed8', badge: '#dbeafe', badgeText: '#1e3a8a' },
-  'The Peak':     { bg: '#f0fdf4', border: '#86efac', label: '#15803d', dot: '#16a34a', badge: '#dcfce7', badgeText: '#14532d' },
+  'Morning Brew': { bg: '#edf2f9', border: '#bccfe8', label: '#1e3a6e', dot: '#1e3a6e', badge: '#dde9f5', badgeText: '#1e3a6e', badgeBorder: '#bccfe8' },
+  'The Peak':     { bg: '#eef6f0', border: '#aad4b6', label: '#1b4d31', dot: '#1b4d31', badge: '#daeee2', badgeText: '#1b4d31', badgeBorder: '#aad4b6' },
 };
 
-// Strip trailing standalone link nodes (source attribution appended at end of seeded content)
 function trimNodes(nodes) {
   if (!nodes) return [];
   let end = nodes.length;
@@ -22,8 +21,8 @@ function RichText({ nodes }) {
       {(nodes || []).map((node, i) => {
         if (node.link) {
           return (
-            <a key={i} href={node.link.href} target='_blank' rel='noopener noreferrer'
-              style={{ color: '#1d4ed8', textDecoration: 'underline', textUnderlineOffset: 2 }}
+            <a key={i} href={node.link.href} target="_blank" rel="noopener noreferrer"
+              style={{ color: '#8b2020', textDecoration: 'underline', textUnderlineOffset: 3 }}
               onClick={e => e.stopPropagation()}>
               {node.link.text}
             </a>
@@ -104,7 +103,10 @@ function Drawer({ story, onClose }) {
   return (
     <>
       <div onClick={handleClose} style={{
-        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 100,
+        position: 'fixed', inset: 0,
+        background: 'rgba(26,18,9,0.5)',
+        backdropFilter: 'blur(2px)',
+        zIndex: 100,
         opacity: visible ? Math.max(0, 1 - dragX / 400) : 0,
         transition: dragging ? 'none' : 'opacity 0.3s ease',
       }} />
@@ -113,33 +115,55 @@ function Drawer({ story, onClose }) {
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
         style={{
-        position: 'fixed', top: 0, right: 0, bottom: 0,
-        width: 'min(540px, 94vw)', background: '#faf9f6', zIndex: 101,
-        display: 'flex', flexDirection: 'column',
-        transform: visible ? `translateX(${dragX}px)` : 'translateX(100%)',
-        transition: dragging ? 'none' : 'transform 0.32s cubic-bezier(0.32, 0.72, 0, 1)',
-        boxShadow: '-6px 0 48px rgba(0,0,0,0.12)',
-        touchAction: 'pan-y',
-      }}>
+          position: 'fixed', top: 0, right: 0, bottom: 0,
+          width: 'min(560px, 96vw)',
+          background: '#faf7f2',
+          borderLeft: '1px solid #d8cfbc',
+          zIndex: 101,
+          display: 'flex', flexDirection: 'column',
+          transform: visible ? `translateX(${dragX}px)` : 'translateX(100%)',
+          transition: dragging ? 'none' : 'transform 0.32s cubic-bezier(0.32, 0.72, 0, 1)',
+          boxShadow: '-12px 0 64px rgba(26,18,9,0.16)',
+          touchAction: 'pan-y',
+        }}>
         <div style={{
-          padding: '14px 16px', borderBottom: '1px solid #e8e4dc',
+          padding: '16px 20px',
+          borderBottom: '1px solid #d8cfbc',
+          background: '#f5f0e8',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0,
         }}>
-          <span style={{ fontSize: 10, letterSpacing: 2, color: '#9ca3af', textTransform: 'uppercase' }}>
+          <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 9, letterSpacing: 2.5, color: '#7a6e62', textTransform: 'uppercase' }}>
             {story.sources.length} source{story.sources.length > 1 ? 's' : ''}
           </span>
-          <div onClick={handleClose} role="button" tabIndex={0} onKeyDown={e => e.key === 'Enter' && handleClose()} style={{ background: '#ede8df', borderRadius: '50%', width: 34, height: 34, cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L13 13M13 1L1 13" stroke="#78716c" strokeWidth="2" strokeLinecap="round"/></svg></div>
+          <div
+            onClick={handleClose}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => e.key === 'Enter' && handleClose()}
+            style={{
+              width: 32, height: 32, borderRadius: '50%',
+              border: '1px solid #d8cfbc', background: '#ede8df',
+              cursor: 'pointer', flexShrink: 0,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M1 1L11 11M11 1L1 11" stroke="#7a6e62" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+          </div>
         </div>
-        <div style={{ flex: 1, overflowY: 'auto', padding: '8px 24px 32px' }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '24px 24px 48px' }}>
           {story.sources.map((source, i) => {
-            const st = SOURCES[source.name] || { bg: '#f9fafb', border: '#e5e7eb', label: '#374151', dot: '#9ca3af' };
+            const st = SOURCES[source.name] || { bg: '#f5f2ed', border: '#d8cfbc', label: '#3a3228', dot: '#7a6e62' };
             return (
-              <div key={i} style={{ background: st.bg, border: '1px solid ' + st.border, borderRadius: 10, padding: '18px 20px', marginBottom: 14 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: st.dot }} />
-                  <span style={{ fontSize: 11, fontWeight: 700, color: st.label, letterSpacing: 1.5, textTransform: 'uppercase' }}>{source.name}</span>
+              <div key={i} style={{ marginBottom: 28, borderLeft: `3px solid ${st.dot}`, paddingLeft: 18 }}>
+                <div style={{ marginBottom: 14 }}>
+                  <span style={{
+                    fontFamily: "'Space Mono', monospace",
+                    fontSize: 10, fontWeight: 700, color: st.label,
+                    letterSpacing: 2, textTransform: 'uppercase',
+                  }}>{source.name}</span>
                 </div>
-                <p style={{ margin: 0, fontSize: 14, lineHeight: 1.85, color: '#374151', fontFamily: 'Georgia, serif' }}>
+                <p style={{ margin: 0, fontSize: 15, lineHeight: 1.9, color: '#2a2018', fontFamily: "'Libre Baskerville', Georgia, serif" }}>
                   <RichText nodes={trimNodes(source.nodes)} />
                 </p>
               </div>
@@ -151,28 +175,44 @@ function Drawer({ story, onClose }) {
   );
 }
 
-function StoryRow({ story }) {
+function StoryRow({ story, index }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [hovered, setHovered] = useState(false);
   return (
     <>
       <button
         onClick={() => setDrawerOpen(true)}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
         style={{
-          width: '100%', background: 'none', border: 'none',
-          borderBottom: '1px solid #ede8df', padding: '14px 0',
+          width: '100%',
+          background: hovered ? 'rgba(212,201,184,0.22)' : 'none',
+          border: 'none',
+          borderBottom: '1px solid #d8cfbc',
+          padding: '16px 8px',
           cursor: 'pointer', textAlign: 'left',
-          display: 'flex', flexDirection: 'column', gap: 8,
+          display: 'flex', flexDirection: 'column', gap: 10,
           WebkitTapHighlightColor: 'transparent',
+          transition: 'background 0.15s ease',
+          animation: 'fadeUp 0.4s ease both',
+          animationDelay: `${index * 35}ms`,
         }}
       >
-        <p style={{ margin: 0, fontSize: 15, lineHeight: 1.65, color: '#1c1917', fontFamily: 'Georgia, serif' }}>
+        <p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.78, color: '#1a1209', fontFamily: "'Libre Baskerville', Georgia, serif" }}>
           {story.summary}
         </p>
-        <div style={{ display: 'flex', gap: 5 }}>
+        <div style={{ display: 'flex', gap: 6 }}>
           {story.sources.map(s => {
-            const st = SOURCES[s.name] || { badge: '#f3f4f6', badgeText: '#374151', border: '#d1d5db' };
+            const st = SOURCES[s.name] || { badge: '#ede8df', badgeText: '#3a3228', badgeBorder: '#d8cfbc' };
             return (
-              <span key={s.name} style={{ fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 3, background: st.badge, color: st.badgeText, border: '1px solid ' + st.border }}>
+              <span key={s.name} style={{
+                fontFamily: "'Space Mono', monospace",
+                fontSize: 8, fontWeight: 700,
+                padding: '3px 8px', borderRadius: 2,
+                background: st.badge, color: st.badgeText,
+                border: `1px solid ${st.badgeBorder}`,
+                letterSpacing: 0.5,
+              }}>
                 {s.name === 'Morning Brew' ? 'MB' : s.name === 'The Peak' ? 'TP' : s.name.slice(0, 2).toUpperCase()}
               </span>
             );
@@ -187,20 +227,28 @@ function StoryRow({ story }) {
 function Bucket({ bucket }) {
   const [collapsed, setCollapsed] = useState(false);
   return (
-    <div style={{ marginBottom: 32 }}>
+    <div style={{ marginBottom: 44 }}>
       <button
         onClick={() => setCollapsed(!collapsed)}
         style={{
           width: '100%', background: 'none', border: 'none',
-          borderBottom: '2px solid #1c1917', paddingBottom: 6, paddingTop: 0,
-          cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          borderBottom: '2px solid #1a1209',
+          padding: '0 0 10px 0',
+          cursor: 'pointer', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
           WebkitTapHighlightColor: 'transparent',
         }}
       >
-        <h2 style={{ margin: 0, fontSize: 10.5, fontWeight: 700, letterSpacing: 2.5, textTransform: 'uppercase', color: '#1c1917', fontFamily: 'Georgia, serif' }}>{bucket.label}</h2>
-        <span style={{ fontSize: 10, color: '#9ca3af' }}>{collapsed ? 'show ' + bucket.stories.length : 'hide'}</span>
+        <h2 style={{
+          margin: 0,
+          fontFamily: "'Space Mono', monospace",
+          fontSize: 10, fontWeight: 700,
+          letterSpacing: 3, textTransform: 'uppercase', color: '#1a1209',
+        }}>{bucket.label}</h2>
+        <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 9, color: '#7a6e62', letterSpacing: 1 }}>
+          {collapsed ? `${bucket.stories.length} stories` : 'hide'}
+        </span>
       </button>
-      {!collapsed && bucket.stories.map((story, i) => <StoryRow key={i} story={story} />)}
+      {!collapsed && bucket.stories.map((story, i) => <StoryRow key={i} story={story} index={i} />)}
     </div>
   );
 }
@@ -209,6 +257,16 @@ export default function DailyDigest({ days, digests, initialReadState }) {
   const [activeDay, setActiveDay] = useState(0);
   const [readState, setReadState] = useState(initialReadState || {});
   const markReadTimer = useRef(null);
+
+  useEffect(() => {
+    if (!document.getElementById('digest-fonts')) {
+      const link = document.createElement('link');
+      link.id = 'digest-fonts';
+      link.rel = 'stylesheet';
+      link.href = 'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Space+Mono:wght@400;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap';
+      document.head.appendChild(link);
+    }
+  }, []);
 
   const persistRead = async (date, isRead) => {
     try {
@@ -254,37 +312,40 @@ export default function DailyDigest({ days, digests, initialReadState }) {
 
   if (!day || !digest) {
     return (
-      <div style={{ background: '#faf9f6', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Georgia, serif' }}>
+      <div style={{ background: '#f5f0e8', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 32, fontWeight: 700, color: '#1c1917', marginBottom: 8 }}>Daily Digest</div>
-          <div style={{ fontSize: 12, color: '#9ca3af' }}>No digests yet. Tomorrow morning, your first one will appear.</div>
+          <div style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 38, fontWeight: 900, color: '#1a1209', marginBottom: 12 }}>Daily Digest</div>
+          <div style={{ fontFamily: "'Space Mono', monospace", fontSize: 11, color: '#7a6e62', letterSpacing: 1 }}>Your first edition arrives tomorrow morning.</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div style={{ background: '#faf9f6', minHeight: '100vh', fontFamily: 'Georgia, serif' }}>
-      {/* Sticky wrapper separate from overflow wrapper — iOS Safari requires this */}
+    <div style={{ background: '#f5f0e8', minHeight: '100vh' }}>
+      <style>{`@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }`}</style>
+
+      {/* Nav */}
       <div style={{ position: 'sticky', top: 0, zIndex: 10 }}>
-        <div style={{ background: '#faf9f6', borderBottom: '1px solid #e8e4dc', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-          <div style={{ display: 'flex', padding: '0 16px', alignItems: 'stretch', width: 'max-content', minWidth: '100%' }}>
+        <div style={{ background: '#f5f0e8', borderBottom: '1px solid #d8cfbc', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          <div style={{ display: 'flex', padding: '0 20px', alignItems: 'stretch', width: 'max-content', minWidth: '100%' }}>
             {days.map((d, i) => {
               const isRead = readState[d.date];
               const isActive = activeDay === i;
               return (
                 <button key={i} onClick={() => setActiveDay(i)} style={{
                   background: 'none', border: 'none',
-                  borderBottom: isActive ? '2px solid #1c1917' : '2px solid transparent',
-                  padding: '14px 10px 12px', cursor: 'pointer',
-                  fontFamily: 'Georgia, serif',
-                  color: isActive ? '#1c1917' : isRead ? '#9ca3af' : '#1c1917',
-                  fontWeight: (isActive || !isRead) ? 700 : 400,
-                  fontSize: 12, whiteSpace: 'nowrap', flexShrink: 0,
-                  display: 'flex', alignItems: 'center', gap: 5,
+                  borderBottom: isActive ? '2px solid #1a1209' : '2px solid transparent',
+                  padding: '13px 12px 11px', cursor: 'pointer',
+                  fontFamily: "'Space Mono', monospace",
+                  color: isActive ? '#1a1209' : isRead ? '#a89e92' : '#1a1209',
+                  fontWeight: isActive || !isRead ? 700 : 400,
+                  fontSize: 10.5, whiteSpace: 'nowrap', flexShrink: 0,
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  letterSpacing: 0.5,
                   WebkitTapHighlightColor: 'transparent',
                 }}>
-                  {!isRead && <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#1d4ed8', flexShrink: 0 }} />}
+                  {!isRead && <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#8b2020', flexShrink: 0 }} />}
                   {d.label}
                 </button>
               );
@@ -293,34 +354,87 @@ export default function DailyDigest({ days, digests, initialReadState }) {
         </div>
       </div>
 
-      <div style={{ maxWidth: 680, margin: '0 auto', padding: '32px 20px 80px' }}>
+      <div style={{ maxWidth: 700, margin: '0 auto', padding: '0 20px 80px' }}>
         <NotificationSetup />
-        <div style={{ textAlign: 'center', marginBottom: 36 }}>
-          <div style={{ fontSize: 9, letterSpacing: 5, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 10 }}>{day.full}</div>
-          <div style={{ fontSize: 44, fontWeight: 700, color: '#1c1917', letterSpacing: '-2px', lineHeight: 1, marginBottom: 16 }}>Daily Digest</div>
-          <div style={{ marginBottom: 14 }}>
+
+        {/* Masthead */}
+        <div style={{ textAlign: 'center', padding: '40px 0 36px', borderBottom: '1px solid #d8cfbc', marginBottom: 44 }}>
+          <div style={{ fontFamily: "'Space Mono', monospace", fontSize: 9, letterSpacing: 4, color: '#7a6e62', textTransform: 'uppercase', marginBottom: 18 }}>
+            {day.full}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16, justifyContent: 'center' }}>
+            <div style={{ flex: 1, height: 1, background: '#1a1209' }} />
+            <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#8b2020' }} />
+            <div style={{ flex: 1, height: 1, background: '#1a1209' }} />
+          </div>
+          <div style={{
+            fontFamily: "'Playfair Display', Georgia, serif",
+            fontSize: 'clamp(44px, 10vw, 64px)',
+            fontWeight: 900,
+            color: '#1a1209',
+            letterSpacing: '-2px',
+            lineHeight: 1,
+            marginBottom: 16,
+          }}>
+            Daily Digest
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 22, justifyContent: 'center' }}>
+            <div style={{ flex: 1, height: 1, background: '#1a1209' }} />
+            <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#8b2020' }} />
+            <div style={{ flex: 1, height: 1, background: '#1a1209' }} />
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, flexWrap: 'wrap' }}>
+            {(digest.sources || []).map(name => {
+              const st = SOURCES[name] || { badge: '#ede8df', badgeText: '#3a3228', badgeBorder: '#d8cfbc' };
+              return (
+                <span key={name} style={{
+                  fontFamily: "'Space Mono', monospace",
+                  fontSize: 9, padding: '4px 12px', borderRadius: 2,
+                  background: st.badge, color: st.badgeText, border: `1px solid ${st.badgeBorder}`,
+                  letterSpacing: 1,
+                }}>{name}</span>
+              );
+            })}
+            <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 9, color: '#c4b9ac' }}>·</span>
             {readState[day.date] ? (
-              <span style={{ fontSize: 11, color: '#9ca3af' }}>Read · <button onClick={(e) => toggleRead(activeDay, e)} style={{ background: 'none', border: 'none', padding: 0, textDecoration: 'underline', cursor: 'pointer', fontSize: 11, color: '#9ca3af', fontFamily: 'Georgia, serif', WebkitTapHighlightColor: 'transparent' }}>Mark as unread</button></span>
+              <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 9, color: '#a89e92', letterSpacing: 1 }}>
+                Read ·{' '}
+                <button onClick={(e) => toggleRead(activeDay, e)} style={{
+                  background: 'none', border: 'none', padding: 0,
+                  textDecoration: 'underline', cursor: 'pointer',
+                  fontFamily: "'Space Mono', monospace", fontSize: 9, color: '#a89e92', letterSpacing: 1,
+                  WebkitTapHighlightColor: 'transparent',
+                }}>Mark unread</button>
+              </span>
             ) : (
-              <span style={{ fontSize: 11, color: '#1d4ed8', fontWeight: 600 }}>● Unread · <button onClick={(e) => toggleRead(activeDay, e)} style={{ background: 'none', border: 'none', padding: 0, textDecoration: 'underline', cursor: 'pointer', fontSize: 11, color: '#9ca3af', fontFamily: 'Georgia, serif', fontWeight: 400, WebkitTapHighlightColor: 'transparent' }}>Mark as read</button></span>
+              <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 9, color: '#8b2020', fontWeight: 700, letterSpacing: 1 }}>
+                ● Unread ·{' '}
+                <button onClick={(e) => toggleRead(activeDay, e)} style={{
+                  background: 'none', border: 'none', padding: 0,
+                  textDecoration: 'underline', cursor: 'pointer',
+                  fontFamily: "'Space Mono', monospace", fontSize: 9, color: '#a89e92', letterSpacing: 1, fontWeight: 400,
+                  WebkitTapHighlightColor: 'transparent',
+                }}>Mark read</button>
+              </span>
             )}
           </div>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginBottom: 20 }}>
-            {(digest.sources || []).map(name => {
-              const st = SOURCES[name] || { badge: '#f3f4f6', badgeText: '#374151', border: '#d1d5db' };
-              return <span key={name} style={{ fontSize: 10, padding: '3px 12px', borderRadius: 20, background: st.badge, color: st.badgeText, border: '1px solid ' + st.border }}>{name}</span>;
-            })}
-          </div>
-          <div style={{ height: 1, background: 'linear-gradient(to right, transparent, #c4b9ac, transparent)' }} />
         </div>
 
         {digest.buckets.map((bucket, i) => <Bucket key={i} bucket={bucket} />)}
 
-        <div style={{ marginTop: 40, paddingTop: 16, borderTop: '1px solid #ede8df', display: 'flex', justifyContent: 'space-between' }}>
-          <span style={{ fontSize: 10, color: '#c4b9ac', letterSpacing: 1, textTransform: 'uppercase' }}>
-            {digest.createdAt ? 'Generated ' + new Date(digest.createdAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }) : 'Generated 7:00 AM'}
+        <div style={{
+          marginTop: 40, paddingTop: 16,
+          borderTop: '1px solid #d8cfbc',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        }}>
+          <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 9, color: '#a89e92', letterSpacing: 1.5, textTransform: 'uppercase' }}>
+            {digest.createdAt
+              ? 'Generated ' + new Date(digest.createdAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+              : 'Generated 7:00 AM'}
           </span>
-          <span style={{ fontSize: 10, color: '#c4b9ac', letterSpacing: 1, textTransform: 'uppercase' }}>{totalStories} stories · {unreadCount > 0 ? unreadCount + ' unread' : 'all read'}</span>
+          <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 9, color: '#a89e92', letterSpacing: 1.5, textTransform: 'uppercase' }}>
+            {totalStories} stories · {unreadCount > 0 ? `${unreadCount} unread` : 'all read'}
+          </span>
         </div>
       </div>
     </div>
