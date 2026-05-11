@@ -6,9 +6,9 @@ export const size = { width: 512, height: 512 };
 export const contentType = 'image/png';
 
 export default async function Icon() {
-  const playfairData = readFileSync(join(process.cwd(), 'public/fonts/PlayfairDisplay.ttf'));
-  const fonts = [{ name: 'Playfair Display', data: playfairData, weight: 900, style: 'normal' }];
-  const serif = 'Playfair Display';
+  const fontData = readFileSync(join(process.cwd(), 'public/fonts/GeorgiaBold.ttf'));
+  const fonts = [{ name: 'Georgia', data: fontData, weight: 700, style: 'normal' }];
+  const serif = 'Georgia';
 
   return new ImageResponse(
     (
