@@ -25,28 +25,28 @@ export default async function AppleIcon() {
       <div style={{
         width: 180, height: 180,
         background: '#f5f0e8',
-        display: 'flex', flexDirection: 'column',
-        alignItems: 'center', justifyContent: 'center',
-        gap: 6,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
       }}>
-        <div style={{
-          fontFamily: 'monospace',
-          fontSize: 19, fontWeight: 700,
-          letterSpacing: 4,
-          color: '#8b2020',
-          textTransform: 'uppercase',
-          lineHeight: 1,
-          marginLeft: 4,
-        }}>DAILY</div>
-        <div style={{ width: 110, height: 1.5, background: '#1a1209' }} />
-        <div style={{
-          fontFamily: serif,
-          fontSize: 41, fontWeight: 900,
-          color: '#1a1209',
-          lineHeight: 1,
-          letterSpacing: -1,
-          marginTop: -2,
-        }}>Digest</div>
+        <div style={{ position: 'relative', display: 'flex' }}>
+          <span style={{
+            fontFamily: serif,
+            fontSize: 105,
+            fontWeight: 900,
+            color: '#1a1209',
+            lineHeight: 1,
+          }}>D</span>
+          <div style={{
+            position: 'absolute',
+            bottom: 5,
+            right: -6,
+            width: 19,
+            height: 19,
+            borderRadius: '50%',
+            background: '#8b2020',
+          }} />
+        </div>
       </div>
     ),
     { ...size, fonts }

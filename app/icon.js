@@ -25,28 +25,28 @@ export default async function Icon() {
       <div style={{
         width: 512, height: 512,
         background: '#f5f0e8',
-        display: 'flex', flexDirection: 'column',
-        alignItems: 'center', justifyContent: 'center',
-        gap: 16,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
       }}>
-        <div style={{
-          fontFamily: 'monospace',
-          fontSize: 54, fontWeight: 700,
-          letterSpacing: 10,
-          color: '#8b2020',
-          textTransform: 'uppercase',
-          lineHeight: 1,
-          marginLeft: 10,
-        }}>DAILY</div>
-        <div style={{ width: 312, height: 3, background: '#1a1209' }} />
-        <div style={{
-          fontFamily: serif,
-          fontSize: 116, fontWeight: 900,
-          color: '#1a1209',
-          lineHeight: 1,
-          letterSpacing: -3,
-          marginTop: -4,
-        }}>Digest</div>
+        <div style={{ position: 'relative', display: 'flex' }}>
+          <span style={{
+            fontFamily: serif,
+            fontSize: 300,
+            fontWeight: 900,
+            color: '#1a1209',
+            lineHeight: 1,
+          }}>D</span>
+          <div style={{
+            position: 'absolute',
+            bottom: 14,
+            right: -18,
+            width: 54,
+            height: 54,
+            borderRadius: '50%',
+            background: '#8b2020',
+          }} />
+        </div>
       </div>
     ),
     { ...size, fonts }
