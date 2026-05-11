@@ -4,11 +4,12 @@ export const size = { width: 512, height: 512 };
 export const contentType = 'image/png';
 
 async function fetchFont(family, weight) {
+  // Use old UA so Google Fonts returns TTF — satori (next/og) doesn't support WOFF2
   const css = await fetch(
-    `https://fonts.googleapis.com/css2?family=${family.replace(/ /g, '+')}:wght@${weight}&display=swap`,
-    { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0 Safari/537.36' } }
+    `https://fonts.googleapis.com/css?family=${family.replace(/ /g, '+')}:${weight}`,
+    { headers: { 'User-Agent': 'Mozilla/4.0 (compatible; MSIE 6.0)' } }
   ).then(r => r.text());
-  const url = css.match(/src: url\((.+?)\) format\('woff2'\)/)?.[1];
+  const url = css.match(/src: url\((.+?)\)/)?.[1];
   if (!url) return null;
   return fetch(url).then(r => r.arrayBuffer());
 }
