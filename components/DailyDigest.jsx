@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import NotificationSetup from './NotificationSetup';
 
 const SOURCES = {
   'Morning Brew': { bg: '#eff6ff', border: '#93c5fd', label: '#1e40af', dot: '#1d4ed8', badge: '#dbeafe', badgeText: '#1e3a8a' },
@@ -185,7 +186,13 @@ export default function DailyDigest({ days, digests, initialReadState }) {
   const digest = digests[days[activeDay]?.date];
   const day = days[activeDay];
   const totalStories = digest?.buckets?.reduce((a, b) => a + b.stories.length, 0) || 0;
-  const unreadCount = Object.values(readState).filter(v => !v).length;
+  const unreadCount = days.filter(d => readState[d.date] !== true).length;
+
+  useEffect(() => {
+    if (typeof navigator === 'undefined' || !('setAppBadge' in navigator)) return;
+    if (unreadCount > 0) navigator.setAppBadge(unreadCount).catch(() => {});
+    else navigator.clearAppBadge?.().catch(() => {});
+  }, [unreadCount]);
 
   if (!day || !digest) {
     return (
@@ -229,6 +236,7 @@ export default function DailyDigest({ days, digests, initialReadState }) {
       </div>
 
       <div style={{ maxWidth: 680, margin: '0 auto', padding: '32px 20px 80px' }}>
+        <NotificationSetup />
         <div style={{ textAlign: 'center', marginBottom: 36 }}>
           <div style={{ fontSize: 9, letterSpacing: 5, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 10 }}>{day.full}</div>
           <div style={{ fontSize: 44, fontWeight: 700, color: '#1c1917', letterSpacing: '-2px', lineHeight: 1, marginBottom: 16 }}>Daily Digest</div>
