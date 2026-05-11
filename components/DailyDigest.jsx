@@ -258,7 +258,7 @@ function usePullToRefresh() {
   const [triggered, setTriggered] = useState(false);
   const startY = useRef(-1);
   const pulling = useRef(false);
-  const THRESHOLD = 80;
+  const THRESHOLD = 120;
 
   useEffect(() => {
     const onTouchStart = (e) => {
@@ -373,15 +373,34 @@ export default function DailyDigest({ days, digests, initialReadState }) {
   return (
     <div style={{ background: '#f5f0e8', minHeight: '100vh' }}>
       <style>{`@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } } @keyframes shimmer { 0%,100% { opacity:1 } 50% { opacity:0.4 } }`}</style>
-      {(progress > 0 || triggered) && (
+      {/* Pull-to-refresh indicator */}
+      {progress > 0 && !triggered && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 20,
+          height: 44, background: '#f5f0e8',
+          borderBottom: `1px solid ${progress >= 1 ? '#8b2020' : '#d8cfbc'}`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+          transform: `translateY(${(progress - 1) * 100}%)`,
+          pointerEvents: 'none',
+          transition: 'border-color 0.15s ease',
+        }}>
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none"
+            style={{ transform: progress >= 1 ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}>
+            <path d="M5.5 1v8M2 6.5l3.5 3.5 3.5-3.5" stroke={progress >= 1 ? '#8b2020' : '#7a6e62'} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <span style={{
+            fontFamily: "'Space Mono', monospace", fontSize: 9,
+            letterSpacing: 2.5, textTransform: 'uppercase',
+            color: progress >= 1 ? '#8b2020' : '#7a6e62',
+            transition: 'color 0.15s ease',
+          }}>
+            {progress >= 1 ? 'Release to refresh' : 'Pull to refresh'}
+          </span>
+        </div>
+      )}
+      {triggered && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, height: 3, zIndex: 200, background: '#e8e2d8' }}>
-          <div style={{
-            height: '100%',
-            background: '#8b2020',
-            width: triggered ? '100%' : `${progress * 100}%`,
-            transition: triggered ? 'width 0.25s ease' : 'none',
-            animation: triggered ? 'shimmer 0.6s ease infinite' : 'none',
-          }} />
+          <div style={{ height: '100%', background: '#8b2020', width: '100%', animation: 'shimmer 0.6s ease infinite' }} />
         </div>
       )}
 
