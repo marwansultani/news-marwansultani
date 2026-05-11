@@ -39,6 +39,12 @@ function RichText({ nodes }) {
 
 function Drawer({ story, onClose }) {
   const [visible, setVisible] = useState(false);
+  const [dragX, setDragX] = useState(0);
+  const startX = useRef(0);
+  const startY = useRef(0);
+  const startTime = useRef(0);
+  const axis = useRef(null);
+
   useEffect(() => { requestAnimationFrame(() => setVisible(true)); }, []);
 
   const handleClose = () => { setVisible(false); setTimeout(onClose, 300); };
@@ -49,19 +55,49 @@ function Drawer({ story, onClose }) {
     return () => document.removeEventListener('keydown', onKey);
   }, []);
 
+  const onTouchStart = (e) => {
+    startX.current = e.touches[0].clientX;
+    startY.current = e.touches[0].clientY;
+    startTime.current = Date.now();
+    axis.current = null;
+  };
+  const onTouchMove = (e) => {
+    const dx = e.touches[0].clientX - startX.current;
+    const dy = e.touches[0].clientY - startY.current;
+    if (axis.current === null && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) {
+      axis.current = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+    }
+    if (axis.current === 'x' && dx > 0) setDragX(dx);
+  };
+  const onTouchEnd = (e) => {
+    if (axis.current !== 'x') return;
+    const dx = e.changedTouches[0].clientX - startX.current;
+    const velocity = dx / (Date.now() - startTime.current);
+    if (dx > 100 || velocity > 0.4) handleClose();
+    else setDragX(0);
+  };
+
+  const dragging = dragX > 0;
+
   return (
     <>
       <div onClick={handleClose} style={{
         position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 100,
-        opacity: visible ? 1 : 0, transition: 'opacity 0.3s ease',
+        opacity: visible ? Math.max(0, 1 - dragX / 400) : 0,
+        transition: dragging ? 'none' : 'opacity 0.3s ease',
       }} />
-      <div style={{
+      <div
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        style={{
         position: 'fixed', top: 0, right: 0, bottom: 0,
         width: 'min(540px, 94vw)', background: '#faf9f6', zIndex: 101,
         display: 'flex', flexDirection: 'column',
-        transform: visible ? 'translateX(0)' : 'translateX(100%)',
-        transition: 'transform 0.32s cubic-bezier(0.32, 0.72, 0, 1)',
+        transform: visible ? `translateX(${dragX}px)` : 'translateX(100%)',
+        transition: dragging ? 'none' : 'transform 0.32s cubic-bezier(0.32, 0.72, 0, 1)',
         boxShadow: '-6px 0 48px rgba(0,0,0,0.12)',
+        touchAction: 'pan-y',
       }}>
         <div style={{
           padding: '14px 16px', borderBottom: '1px solid #e8e4dc',
