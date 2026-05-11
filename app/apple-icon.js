@@ -1,25 +1,14 @@
 import { ImageResponse } from 'next/og';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 export const size = { width: 180, height: 180 };
 export const contentType = 'image/png';
 
-async function fetchFont(family, weight) {
-  // Use old UA so Google Fonts returns TTF — satori (next/og) doesn't support WOFF2
-  const css = await fetch(
-    `https://fonts.googleapis.com/css?family=${family.replace(/ /g, '+')}:${weight}`,
-    { headers: { 'User-Agent': 'Mozilla/4.0 (compatible; MSIE 6.0)' } }
-  ).then(r => r.text());
-  const url = css.match(/src: url\((.+?)\)/)?.[1];
-  if (!url) return null;
-  return fetch(url).then(r => r.arrayBuffer());
-}
-
 export default async function AppleIcon() {
-  const playfairData = await fetchFont('Playfair Display', 900).catch(() => null);
-  const fonts = playfairData
-    ? [{ name: 'Playfair Display', data: playfairData, weight: 900, style: 'normal' }]
-    : [];
-  const serif = playfairData ? 'Playfair Display' : 'Georgia, serif';
+  const playfairData = readFileSync(join(process.cwd(), 'public/fonts/PlayfairDisplay.ttf'));
+  const fonts = [{ name: 'Playfair Display', data: playfairData, weight: 900, style: 'normal' }];
+  const serif = 'Playfair Display';
 
   return new ImageResponse(
     (
