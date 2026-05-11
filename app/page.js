@@ -36,7 +36,7 @@ export default async function Home() {
 
   const digests = {};
   (digestRows || []).forEach(d => {
-    digests[d.date] = { buckets: d.buckets, sources: d.sources };
+    digests[d.date] = { buckets: d.buckets, sources: d.sources, createdAt: d.created_at };
   });
 
   return <DailyDigest days={days} digests={digests} initialReadState={initialReadState} />;
