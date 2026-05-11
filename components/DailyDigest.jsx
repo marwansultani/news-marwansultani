@@ -245,7 +245,7 @@ function Bucket({ bucket }) {
           letterSpacing: 3, textTransform: 'uppercase', color: '#1a1209',
         }}>{bucket.label}</h2>
         <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 9, color: '#7a6e62', letterSpacing: 1 }}>
-          {collapsed ? `${bucket.stories.length} stories` : 'hide'}
+          {collapsed ? `${bucket.stories.length} ${bucket.stories.length === 1 ? 'story' : 'stories'}` : 'hide'}
         </span>
       </button>
       {!collapsed && bucket.stories.map((story, i) => <StoryRow key={i} story={story} index={i} />)}
